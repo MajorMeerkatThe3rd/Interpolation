@@ -1,0 +1,14 @@
+﻿  vrl.cpp
+c1xx : warning C4199: two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP; use /Zc:twoPhase-
+c:\users\micha\documents\interpolation\c++\vrl.cpp(104): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\micha\documents\interpolation\c++\vrl.cpp(108): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\micha\documents\interpolation\c++\vrl.cpp(574): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\micha\documents\interpolation\c++\vrl.cpp(787): warning C4101: 'dist_lightSample_closestPointL': unreferenced local variable
+c:\users\micha\documents\interpolation\c++\vrl.cpp(808): warning C4101: 'dist_cameraSample_closestPoint': unreferenced local variable
+c:\users\micha\documents\interpolation\c++\vrl.cpp(869): warning C4101: 'dist_lightSample_closestPoint': unreferenced local variable
+c:\users\micha\documents\interpolation\c++\vrl_tests.h(7): warning C4101: 'i': unreferenced local variable
+c:\users\micha\documents\interpolation\c++\vrl_tests.h(148): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\micha\documents\interpolation\c++\vrl.cpp(1244): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\micha\documents\interpolation\c++\vrl.cpp(1217): warning C4102: 'std': unreferenced label
+c:\users\micha\documents\interpolation\c++\vrl.cpp(293): warning C4715: 'AABox::normal': not all control paths return a value
+  VirtualRayLights.vcxproj -> C:\Users\micha\Documents\Interpolation\c++\x64\Debug\VirtualRayLights.exe

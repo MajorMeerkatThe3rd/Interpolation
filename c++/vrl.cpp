@@ -661,6 +661,40 @@ Vec getAngularDomainSample_LinearInterpolation(Segment segment, Vec closestPoint
 	return camSample;
 }
 
+
+
+struct Matrix4 {
+	double m[16];
+	Matrix4(double a0, double b0, double c0, double d0, double e0, double f0, double g0, double h0, double i0, double j0, double k0, double l0, double m0, double n0, double o0, double p0) {
+		m[0] = a0; m[1] = b0; m[2] = c0; m[3] = d0; m[4] = e0; m[5] = f0; m[6] = g0; m[7] = h0; m[8] = i0; m[9] = j0; m[10] = k0; m[11] = l0; m[12] = m0; m[13] = n0; m[14] = o0; m[15] = p0;
+	}
+	Matrix4(double x0) { for (int i = 0; i < 16; ++i) m[i] = x0; }
+	Matrix4() { for (int i = 0; i < 16; ++i) m[i] = 0; }
+};
+
+struct Vector4 {
+	double x, y, z, w;
+	Vector4(double x0, double y0, double z0, double w0) { x = x0; y = y0; z = z0; w = w0; }
+	Vector4(double x0) { x = x0; y = x0; z = x0; w = x0; }
+	Vector4() { x = 0; y = 0; z = 0; w = 0; }
+	Vector4 operator+(const Vector4 &b) const { return Vector4(x + b.x, y + b.y, z + b.z, w + b.w); }
+	Vector4 operator-(const Vector4 &b) const { return Vector4(x - b.x, y - b.y, z - b.z, w - b.w); }
+	Vector4 operator*(double b) const { return Vector4(x*b, y*b, z*b, w*b); }
+	Vector4 operator*(const Vector4 &b) const { return Vector4(x*b.x, y*b.y, z*b.z, w*b.w); }
+
+	Vector4 operator*(const Matrix4 &b) const {
+		return Vector4(b.m[0] * x + b.m[4] * y + b.m[8] * z + b.m[12] * w,
+			b.m[1] * x + b.m[5] * y + b.m[9] * z + b.m[13] * w,
+			b.m[2] * x + b.m[6] * y + b.m[10] * z + b.m[14] * w,
+			b.m[3] * x + b.m[7] * y + b.m[11] * z + b.m[15] * w);
+	}
+
+	Vector4 operator/(double b) const { return Vector4(x / b, y / b, z / b, w / b); }
+	Vector4 operator/(const Vector4 &b) const { return Vector4(x / b.x, y / b.y, z / b.z, w / b.w); }
+	Vector4& norm() { return *this = *this * (1 / std::sqrt(x*x + y * y + z * z + w * w)); }
+	double length() { return std::sqrt(x*x + y * y + z * z + w * w); }
+};
+
 // advance sampling proportional to the product of the phase functions and the inverse squared distance - other interpolation
 Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint, Vec sample, Vec lightDirection, double g, double dist_rayOrigin_closestPoint, double dist_interestPoint_closestPoint, double &pdf) {
 	Vec segmentDirection = segment.direction*-1;
@@ -711,54 +745,35 @@ Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint,
 	if (inRange) {
 
 	} else {
-		Matrix4 B = Matrix4(theta_1, theta_M, 0, 1,
-							fs_1, fs_M, -1, 0,
-							0, 0, 0, 0, 
-							0, 0, 0, 0);
+		Matrix4 B = Matrix4(theta_1, fs_1, 0, 0,
+			theta_M, fs_M, 0, 0,
+			0, -.1, 0, 0,
+			1, 0, 0, 0);
 
-		Vector4 u = Vector4(x*x*x, x*x, x, 1);
+		// TODO create math behind this to see what can be discarded from formula
 
-		// TODO create math behind this to see formula
 
+		// check against the real values
+		float samples = 10.0;
+		fprintf(stdout, "theta_1: %f, fs_1: %f\n", theta_1, fs_1);
+		fprintf(stdout, "theta_M: %f, fs_M: %f\n", theta_M, fs_M);
+		for (int i = 1; i < samples; i++) {
+			float x = (float)i / samples;
+			Vector4 U = Vector4(x*x*x, x*x, x, 1);
+			Vector4 p = U * M * B;
+
+			float theta_x = p.x;
+			Vec dir = rotateVec(c, a, theta_x); // TODO: check if not already a vector like this
+			float fs_x = pfHenyeyGreenstein(segmentDirection, dir, g) * pfHenyeyGreenstein(lightDirection, dir, g);
+
+			float diff = p.y - fs_x;
+			fprintf(stdout, "x: %f\np.x: %f, p.y: %f\ntheta_x: %f, fs_x: %f\ndiff: %f\n\n", x, p.x, p.y, theta_x, fs_x, diff);
+		}
 	}
 	// INTERPOLATION CHANGE - END
 
 	return getAngularDomainSample_LinearInterpolation(segment, closestPoint, sample, lightDirection, g, dist_rayOrigin_closestPoint, dist_interestPoint_closestPoint, pdf);
 }
-
-
-struct Matrix4 {
-	double m[16];
-	Matrix4(double a0, double b0, double c0, double d0, double e0, double f0, double g0, double h0, double i0, double j0, double k0, double l0, double m0, double n0, double o0, double p0) { 
-		m[0] = a0; m[1] = b0; m[2] = c0; m[3] = d0; m[4] = e0; m[5] = f0; m[6] = g0; m[7] = h0; m[8] = i0; m[9] = j0; m[10] = k0; m[11] = l0; m[12] = m0; m[13] = n0; m[14] = o0; m[15] = p0;
-	}
-	Matrix4(double x0) { for (int i = 0; i < 16; ++i) m[i] = x0; }
-	Matrix4() { for (int i = 0; i < 16; ++i) m[i] = 0; }
-};
-
-struct Vector4 {
-	double x, y, z, w;
-	Vector4(double x0, double y0, double z0, double w0) { x = x0; y = y0; z = z0; w = w0; }
-	Vector4(double x0) { x = x0; y = x0; z = x0; w = x0; }
-	Vector4() { x = 0; y = 0; z = 0; w = 0; }
-	Vector4 operator+(const Vector4 &b) const { return Vector4(x + b.x, y + b.y, z + b.z, w + b.w); }
-	Vector4 operator-(const Vector4 &b) const { return Vector4(x - b.x, y - b.y, z - b.z, w - b.w); }
-	Vector4 operator*(double b) const { return Vector4(x*b, y*b, z*b, w*b); }
-	Vector4 operator*(const Vector4 &b) const { return Vector4(x*b.x, y*b.y, z*b.z, w*b.w); }
-
-	Vector4 operator*(const Matrix4 &b) const { 
-		return Vector4(	b.m[0] * x + b.m[1] * y + b.m[2] * z + b.m[3] * w,
-						b.m[4] * x + b.m[5] * y + b.m[6] * z + b.m[7] * w,
-						b.m[8] * x + b.m[9] * y + b.m[10] * z + b.m[11] * w,
-						b.m[12] * x + b.m[13] * y + b.m[14] * z + b.m[15] * w);
-	}
-
-	Vector4 operator/(double b) const { return Vector4(x / b, y / b, z / b, w / b); }
-	Vector4 operator/(const Vector4 &b) const { return Vector4(x / b.x, y / b.y, z / b.z, w / b.w); }
-	Vector4& norm() { return *this = *this * (1 / std::sqrt(x*x + y * y + z * z + w * w)); }
-	double length() { return std::sqrt(x*x + y * y + z * z + w * w); }
-};
-
 
 // calclualte the radiance from the medium
 Vec mediumRadiance(const Scene& scene, std::vector<Segment> lightRays, Segment cameraRay, RenderSettings settings) {
