@@ -674,33 +674,23 @@ Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint,
 
 	dist_rayOrigin_closestPoint = segment.distance - dist_rayOrigin_closestPoint;
 
-	string testOutput = "\n\ntest data:\n";
-
 	// evaluate the angle to the start and the product of the phase functions with this angle
 	double theta_1 = atan(-dist_rayOrigin_closestPoint / dist_interestPoint_closestPoint);
 	double fs_1 = pfHenyeyGreenstein(segmentDirection, a, g) * pfHenyeyGreenstein(lightDirection, a, g);
-
-	testOutput += "\ttheta_1: " + to_string(theta_1) + "\n" +
-		"\tfs: " + to_string(fs_1) + "\n" +
-		"\tfs_c: " + to_string(pfHenyeyGreenstein(segmentDirection, a, g)) + "\n" +
-		"\tfs_l: " + to_string(pfHenyeyGreenstein(lightDirection, a, g)) + "\n\n";
 
 	// evaluate the angle to the end and the product of the phase functions with this angle
 	double theta_M = atan((segment.distance - dist_rayOrigin_closestPoint) / dist_interestPoint_closestPoint);
 	double fs_M = pfHenyeyGreenstein(segmentDirection, b, g) * pfHenyeyGreenstein(lightDirection, b, g);
 
-	testOutput += "\ttheta_M: " + to_string(theta_M) + "\n" +
-		"\tfs: " + to_string(fs_M) + "\n" +
-		"\tfs_c: " + to_string(pfHenyeyGreenstein(segmentDirection, b, g)) + "\n" +
-		"\tfs_l: " + to_string(pfHenyeyGreenstein(lightDirection, b, g)) + "\n\n";
-
-	double theta_peak;
+	double theta_peak, fs_peak;
 	bool inRange = false;
 
 	// check if the peak lies on the arc
 	if ((a%e).dot((a%b)) >= 0 && (b%e).dot((b%a)) >= 0) {
 		// calculate the angle to the peak
 		theta_peak = arccos(a.dot(e)) + theta_1;
+		Vec dir = rotateVec(c, a, theta_peak); // TODO: check if not already a vector like this
+		fs_peak = pfHenyeyGreenstein(segmentDirection, dir, g) * pfHenyeyGreenstein(lightDirection, dir, g);
 		inRange = true;
 	}
 	else {
@@ -709,23 +699,66 @@ Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint,
 		if ((a%e).dot((a%b)) >= 0 && (b%e).dot((b%a)) >= 0) {
 			// calculate the angle to the peak
 			theta_peak = arccos(a.dot(e)) + theta_1;
+			Vec dir = rotateVec(c, a, theta_peak); // TODO: check if not already a vector like this
+			fs_peak = pfHenyeyGreenstein(segmentDirection, dir, g) * pfHenyeyGreenstein(lightDirection, dir, g);
 			inRange = true;
 		}
 	}
-	double fs_peak;
 
-	if (inRange) {
-		Vec dir = rotateVec(c, a, theta_peak);
-		fs_peak = pfHenyeyGreenstein(segmentDirection, dir, g) * pfHenyeyGreenstein(lightDirection, dir, g);
-	}
-
+	Matrix4 M = Matrix4(2, -2, 1, 1, -3, 3, -2, -1, 0, 0, 1, 0, 1, 0, 0, 0);
 
 	// INTERPOLATION CHANGE - START
+	if (inRange) {
 
+	} else {
+		Matrix4 B = Matrix4(theta_1, theta_M, 0, 1,
+							fs_1, fs_M, -1, 0,
+							0, 0, 0, 0, 
+							0, 0, 0, 0);
+
+		Vector4 u = Vector4(x*x*x, x*x, x, 1);
+
+		// TODO create math behind this to see formula
+
+	}
 	// INTERPOLATION CHANGE - END
 
 	return getAngularDomainSample_LinearInterpolation(segment, closestPoint, sample, lightDirection, g, dist_rayOrigin_closestPoint, dist_interestPoint_closestPoint, pdf);
 }
+
+
+struct Matrix4 {
+	double m[16];
+	Matrix4(double a0, double b0, double c0, double d0, double e0, double f0, double g0, double h0, double i0, double j0, double k0, double l0, double m0, double n0, double o0, double p0) { 
+		m[0] = a0; m[1] = b0; m[2] = c0; m[3] = d0; m[4] = e0; m[5] = f0; m[6] = g0; m[7] = h0; m[8] = i0; m[9] = j0; m[10] = k0; m[11] = l0; m[12] = m0; m[13] = n0; m[14] = o0; m[15] = p0;
+	}
+	Matrix4(double x0) { for (int i = 0; i < 16; ++i) m[i] = x0; }
+	Matrix4() { for (int i = 0; i < 16; ++i) m[i] = 0; }
+};
+
+struct Vector4 {
+	double x, y, z, w;
+	Vector4(double x0, double y0, double z0, double w0) { x = x0; y = y0; z = z0; w = w0; }
+	Vector4(double x0) { x = x0; y = x0; z = x0; w = x0; }
+	Vector4() { x = 0; y = 0; z = 0; w = 0; }
+	Vector4 operator+(const Vector4 &b) const { return Vector4(x + b.x, y + b.y, z + b.z, w + b.w); }
+	Vector4 operator-(const Vector4 &b) const { return Vector4(x - b.x, y - b.y, z - b.z, w - b.w); }
+	Vector4 operator*(double b) const { return Vector4(x*b, y*b, z*b, w*b); }
+	Vector4 operator*(const Vector4 &b) const { return Vector4(x*b.x, y*b.y, z*b.z, w*b.w); }
+
+	Vector4 operator*(const Matrix4 &b) const { 
+		return Vector4(	b.m[0] * x + b.m[1] * y + b.m[2] * z + b.m[3] * w,
+						b.m[4] * x + b.m[5] * y + b.m[6] * z + b.m[7] * w,
+						b.m[8] * x + b.m[9] * y + b.m[10] * z + b.m[11] * w,
+						b.m[12] * x + b.m[13] * y + b.m[14] * z + b.m[15] * w);
+	}
+
+	Vector4 operator/(double b) const { return Vector4(x / b, y / b, z / b, w / b); }
+	Vector4 operator/(const Vector4 &b) const { return Vector4(x / b.x, y / b.y, z / b.z, w / b.w); }
+	Vector4& norm() { return *this = *this * (1 / std::sqrt(x*x + y * y + z * z + w * w)); }
+	double length() { return std::sqrt(x*x + y * y + z * z + w * w); }
+};
+
 
 // calclualte the radiance from the medium
 Vec mediumRadiance(const Scene& scene, std::vector<Segment> lightRays, Segment cameraRay, RenderSettings settings) {
