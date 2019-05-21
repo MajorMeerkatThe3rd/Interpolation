@@ -695,6 +695,16 @@ struct Vector4 {
 	double length() { return std::sqrt(x*x + y * y + z * z + w * w); }
 };
 
+int sCCount = 0;
+float sCCurrent = 0.0;
+
+void sampleComparison(float diff) {
+	sCCount++;
+	sCCurrent += diff;
+	if(sCCount % 10000 == 0)
+		fprintf(stdout, "diff after %d samples: %f\n", sCCount, sCCurrent / (float) sCCount);
+}
+
 // advance sampling proportional to the product of the phase functions and the inverse squared distance - other interpolation
 Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint, Vec sample, Vec lightDirection, double g, double dist_rayOrigin_closestPoint, double dist_interestPoint_closestPoint, double &pdf) {
 	Vec segmentDirection = segment.direction*-1;
@@ -745,29 +755,36 @@ Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint,
 	if (inRange) {
 
 	} else {
-		Matrix4 B = Matrix4(theta_1, fs_1, 0, 0,
-			theta_M, fs_M, 0, 0,
-			0, -.1, 0, 0,
-			1, 0, 0, 0);
+		Matrix4 B = Matrix4(theta_1 + PI, fs_1, 0, 0,
+			theta_M + PI, fs_M, 0, 0,
+			0, -abs(fs_M - fs_1), 0, 0,
+			abs(fs_M - fs_1), 0, 0, 0);
 
 		// TODO create math behind this to see what can be discarded from formula
 
 
 		// check against the real values
 		float samples = 10.0;
-		fprintf(stdout, "theta_1: %f, fs_1: %f\n", theta_1, fs_1);
-		fprintf(stdout, "theta_M: %f, fs_M: %f\n", theta_M, fs_M);
+		//fprintf(stdout, "theta_1: %f, fs_1: %f\n", theta_1, fs_1);
+		//fprintf(stdout, "theta_M: %f, fs_M: %f\n", theta_M, fs_M);
 		for (int i = 1; i < samples; i++) {
 			float x = (float)i / samples;
 			Vector4 U = Vector4(x*x*x, x*x, x, 1);
 			Vector4 p = U * M * B;
 
-			float theta_x = p.x;
+			float theta_x = p.x - PI;
+			if (theta_1 > theta_x || theta_x > theta_M) {
+				fprintf(stdout, "\ntheta err\ntheta_1: %f, theta_M: %f, theta: %f", theta_1 + PI, theta_M + PI, theta_x + PI);
+				fprintf(stdout, "\np.x: %f, p.y: %f, p.z: %f, p.w: %f, ", p.x, p.y, p.z, p.w);
+				fprintf(stdout, "\nfs_1: %f, fs_M: %f", fs_1, fs_M);
+			}
+
 			Vec dir = rotateVec(c, a, theta_x); // TODO: check if not already a vector like this
 			float fs_x = pfHenyeyGreenstein(segmentDirection, dir, g) * pfHenyeyGreenstein(lightDirection, dir, g);
 
 			float diff = p.y - fs_x;
-			fprintf(stdout, "x: %f\np.x: %f, p.y: %f\ntheta_x: %f, fs_x: %f\ndiff: %f\n\n", x, p.x, p.y, theta_x, fs_x, diff);
+			sampleComparison(abs(diff));
+			//fprintf(stdout, "x: %f\np.x: %f, p.y: %f\ntheta_x: %f, fs_x: %f\ndiff: %f\n\n", x, p.x - PI, p.y, theta_x, fs_x, diff);
 		}
 	}
 	// INTERPOLATION CHANGE - END
