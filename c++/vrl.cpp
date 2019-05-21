@@ -505,7 +505,7 @@ Vec getEquiAngularSample(Segment segment, Vec closestPoint, double dist_rayOrigi
 	return closestPoint + segment.direction*dist_sample_closestPoint;
 }
 
-const int M = 10;
+const int M = 1000;
 struct PiecewiseSegments {
 	double k[M - 1], d[M - 1];
 	double cdf[M - 1];
@@ -792,6 +792,18 @@ Vec getAngularDomainSample_OtherInterpolation(Segment segment, Vec closestPoint,
 	return getAngularDomainSample_LinearInterpolation(segment, closestPoint, sample, lightDirection, g, dist_rayOrigin_closestPoint, dist_interestPoint_closestPoint, pdf);
 }
 
+int sampleComparisonCount = 0;
+float sampleComparisonCurrent = 0.0;
+
+
+void sampleComparison(Vec s1, Vec s2) {
+	sampleComparisonCount++;
+	sampleComparisonCurrent += s1.dist(s2);
+	if (sampleComparisonCount % 1000 == 0) {
+		fprintf(stdout, "\navg distance after %d runs: %f", sampleComparisonCount, sampleComparisonCurrent / (float)sampleComparisonCount);
+	}
+}
+
 // calclualte the radiance from the medium
 Vec mediumRadiance(const Scene& scene, std::vector<Segment> lightRays, Segment cameraRay, RenderSettings settings) {
 	Vec contribution;
@@ -840,7 +852,10 @@ Vec mediumRadiance(const Scene& scene, std::vector<Segment> lightRays, Segment c
 		} else if (settings.sampling == SAMPLE_ADJ_SI) {
 			cameraSample = getAngularDomainSample_LinearInterpolation(cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
 		} else if (settings.sampling == SAMPLE_ADJ_OI) {
-			cameraSample = getAngularDomainSample_OtherInterpolation(cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
+			Vec cameraSample1, cameraSample2;
+			cameraSample1 = getAngularDomainSample_LinearInterpolation(random, cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
+			cameraSample2 = getAngularDomainSample_OtherInterpolation(random, cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
+			sampleComparison(cameraSample1, cameraSample2);
 		}
 
 		dist_cameraOrigin_cameraSample = (cameraRay.origin - cameraSample).length();
