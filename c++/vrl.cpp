@@ -853,8 +853,8 @@ Vec mediumRadiance(const Scene& scene, std::vector<Segment> lightRays, Segment c
 			cameraSample = getAngularDomainSample_LinearInterpolation(cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
 		} else if (settings.sampling == SAMPLE_ADJ_OI) {
 			Vec cameraSample1, cameraSample2;
-			cameraSample1 = getAngularDomainSample_LinearInterpolation(random, cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
-			cameraSample2 = getAngularDomainSample_OtherInterpolation(random, cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
+			cameraSample1 = getAngularDomainSample_LinearInterpolation(cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
+			cameraSample2 = getAngularDomainSample_OtherInterpolation(cameraRay, closestPointC, lightSample, lightRay.direction, scene.medium->g, dist_cameraOrigin_closestPointC, dist_lightSample_closestPointC, pdf_camera);
 			sampleComparison(cameraSample1, cameraSample2);
 		}
 

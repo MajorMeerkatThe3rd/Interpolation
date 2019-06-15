@@ -1,5 +1,4 @@
 ﻿  vrl.cpp
-<<<<<<< HEAD
 d:\users\michael\documents\interpolation\c++\vrl.cpp(104): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 d:\users\michael\documents\interpolation\c++\vrl.cpp(108): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 d:\users\michael\documents\interpolation\c++\vrl.cpp(392): warning C4018: '<': signed/unsigned mismatch
@@ -7,27 +6,12 @@ d:\users\michael\documents\interpolation\c++\vrl.cpp(574): warning C4244: '=': c
 d:\users\michael\documents\interpolation\c++\vrl.cpp(775): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 d:\users\michael\documents\interpolation\c++\vrl.cpp(783): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 d:\users\michael\documents\interpolation\c++\vrl.cpp(785): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\users\michael\documents\interpolation\c++\vrl.cpp(807): warning C4101: 'dist_lightSample_closestPointL': unreferenced local variable
-d:\users\michael\documents\interpolation\c++\vrl.cpp(828): warning C4101: 'dist_cameraSample_closestPoint': unreferenced local variable
-d:\users\michael\documents\interpolation\c++\vrl.cpp(889): warning C4101: 'dist_lightSample_closestPoint': unreferenced local variable
+d:\users\michael\documents\interpolation\c++\vrl.cpp(801): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+d:\users\michael\documents\interpolation\c++\vrl.cpp(819): warning C4101: 'dist_lightSample_closestPointL': unreferenced local variable
+d:\users\michael\documents\interpolation\c++\vrl.cpp(840): warning C4101: 'dist_cameraSample_closestPoint': unreferenced local variable
+d:\users\michael\documents\interpolation\c++\vrl.cpp(904): warning C4101: 'dist_lightSample_closestPoint': unreferenced local variable
 d:\users\michael\documents\interpolation\c++\vrl_tests.h(7): warning C4101: 'i': unreferenced local variable
-d:\users\michael\documents\interpolation\c++\vrl.cpp(1237): warning C4102: 'std': unreferenced label
+d:\users\michael\documents\interpolation\c++\vrl.cpp(1252): warning C4102: 'std': unreferenced label
 d:\users\michael\documents\interpolation\c++\vrl.cpp(293): warning C4715: 'AABox::normal': not all control paths return a value
+  LINK : D:\Users\Michael\Documents\Interpolation\c++\Debug\VirtualRayLights.exe not found or not built by the last incremental link; performing full link
   VirtualRayLights.vcxproj -> D:\Users\Michael\Documents\Interpolation\c++\Debug\VirtualRayLights.exe
-=======
-c:\users\micha\documents\interpolation\c++\vrl.cpp(104): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(108): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(392): warning C4018: '<': signed/unsigned mismatch
-c:\users\micha\documents\interpolation\c++\vrl.cpp(574): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(765): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(767): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(769): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(784): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-c:\users\micha\documents\interpolation\c++\vrl.cpp(802): warning C4101: 'dist_lightSample_closestPointL': unreferenced local variable
-c:\users\micha\documents\interpolation\c++\vrl.cpp(823): warning C4101: 'dist_cameraSample_closestPoint': unreferenced local variable
-c:\users\micha\documents\interpolation\c++\vrl.cpp(887): warning C4101: 'dist_lightSample_closestPoint': unreferenced local variable
-c:\users\micha\documents\interpolation\c++\vrl_tests.h(7): warning C4101: 'i': unreferenced local variable
-c:\users\micha\documents\interpolation\c++\vrl.cpp(1235): warning C4102: 'std': unreferenced label
-c:\users\micha\documents\interpolation\c++\vrl.cpp(293): warning C4715: 'AABox::normal': not all control paths return a value
-  VirtualRayLights.vcxproj -> C:\Users\micha\Documents\Interpolation\c++\Debug\VirtualRayLights.exe
->>>>>>> master
